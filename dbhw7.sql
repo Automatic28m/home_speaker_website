@@ -56,6 +56,15 @@ CREATE TABLE order_details (
         REFERENCES products(id) ON DELETE CASCADE
 );
 
+CREATE TABLE cart (
+  customer_id int(11) NOT NULL,
+  product_id int(11) NOT NULL,
+  quantity int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (customer_id, product_id),
+  CONSTRAINT fk_cart_user FOREIGN KEY (customer_id) REFERENCES users (id) ON DELETE CASCADE,
+  CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 INSERT INTO users (username, password, first_name, last_name, gender, age, province, email, role) 
 VALUES ('admin', '1234', 'Admin', 'System', 'Male', 30, 'กระบี่', 'admin@system.com', 'admin');

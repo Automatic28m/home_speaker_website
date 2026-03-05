@@ -3,8 +3,32 @@ include './db.php';
 
 if (isset($_GET['delete_id'])) {
     $id = $_GET['delete_id'];
+
+    // 1. Fetch image filenames before deleting the database record
+    $stmt = $conn->prepare("SELECT img_files FROM products WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $product = $res->fetch_assoc();
+
+    if ($product && !empty($product['img_files'])) {
+        // 2. Split the comma-separated string into an array
+        $images = explode(',', $product['img_files']);
+        $upload_dir = "./prod_images/";
+
+        // 3. Loop through and delete each file from the local folder
+        foreach ($images as $img) {
+            $file_path = $upload_dir . trim($img);
+            if (file_exists($file_path)) {
+                unlink($file_path); // Physically deletes the file
+            }
+        }
+    }
+
+    // 4. Finally, delete the record from the database
     $conn->query("DELETE FROM products WHERE id = $id");
     header("Location: admin_show_products.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -36,8 +60,8 @@ if (isset($_GET['delete_id'])) {
                 <thead>
                     <tr class="bg-slate-100 text-slate-600 uppercase text-xs">
                         <th class="p-4 border-b">รูปภาพ</th>
-                        <th class="p-4 border-b">รายละเอียด</th>
                         <th class="p-4 border-b">ชื่อสินค้า</th>
+                        <th class="p-4 border-b">รายละเอียด</th>
                         <th class="p-4 border-b text-center">ราคา</th>
                         <th class="p-4 border-b text-center">คงเหลือ</th>
                         <th class="p-4 border-b text-center">จัดการ</th>
@@ -61,11 +85,13 @@ if (isset($_GET['delete_id'])) {
                                 ?>
                             </td>
                             <td class="p-4 border-b font-medium"><?php echo $row['name']; ?></td>
-                            <td class="p-4 border-b font-medium"><?php echo $row['detail']; ?></td>
+                            <td class="p-4 border-b font-medium">
+                                <?php echo htmlspecialchars(mb_strimwidth($row['detail'] ?? '', 0, 50, "...")); ?>
+                            </td>
                             <td class="p-4 border-b text-center">฿<?php echo number_format($row['price'], 2); ?></td>
                             <td class="p-4 border-b text-center"><?php echo $row['remain']; ?></td>
                             <td class="p-4 border-b text-center space-x-2">
-                                <a href="edit.php?id=<?php echo $row['id']; ?>" class="text-blue-600 hover:underline text-sm">แก้ไข</a>
+                                <a href="admin_edit_product.php?id=<?php echo $row['id']; ?>" class="text-blue-600 hover:underline text-sm">แก้ไข</a>
                                 <a href="?delete_id=<?php echo $row['id']; ?>" onclick="return confirm('ยืนยันการลบ?')" class="text-red-600 hover:underline text-sm">ลบ</a>
                             </td>
                         </tr>

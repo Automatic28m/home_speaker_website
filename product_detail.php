@@ -1,6 +1,6 @@
 <?php
 include './db.php';
-
+session_start();
 $id = $_GET['id'];
 $sql = "SELECT p.*, c.name as c_name FROM products as p, categories as c WHERE p.category_id = c.id AND p.id = $id";
 $result = $conn->query($sql);
@@ -26,14 +26,14 @@ $images = explode(',', $row['img_files']);
 <body>
     <div class="font-['Prompt',_sans-serif] my-16">
         <div class="">
-            <div class="flex flex-col items-left gap-4 max-w-5xl mx-auto ">
+            <!-- <div class="flex flex-col items-left gap-4 max-w-5xl mx-auto ">
                 <span class="text-xl text-slate-500">
                     <?php echo $row['c_name'] ?>
                 </span>
                 <span class="text-center-mb-8 text-5xl text-slate-800 uppercase">
                     <?php echo $row['name'] ?>
                 </span>
-            </div>
+            </div> -->
 
             <!-- Slider Container -->
             <div x-data="{ 
@@ -43,7 +43,8 @@ $images = explode(',', $row['img_files']);
                 }"
                 class="relative w-full max-w-4xl mx-auto overflow-hidden rounded-lg my-10">
 
-                <div class="relative h-96"> <template x-for="(image, index) in images" :key="index">
+                <div class="relative h-96">
+                    <template x-for="(image, index) in images" :key="index">
                         <div x-show="activeSlide === index"
                             x-transition:enter="transition ease-out duration-300"
                             x-transition:enter-start="opacity-0 transform scale-95"
@@ -66,60 +67,87 @@ $images = explode(',', $row['img_files']);
                 <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                     <template x-for="(image, index) in images" :key="index">
                         <button @click="activeSlide = index"
-                            :class="activeSlide === index ? 'bg-slate-800 w-4' : 'bg-white/50 w-2'"
+                            :class="activeSlide === index ? 'bg-slate-800 w-4' : 'bg-gray-200 w-2'"
                             class="h-2 rounded-full transition-all duration-300"></button>
                     </template>
                 </div>
             </div>
 
-            <div class="max-w-5xl mx-auto flex gap-4">
-                <div class="flex items-center gap-4 font-['Prompt']" x-data="{ count: 1, stock: <?php echo $row['remain']; ?> }">
-                    <span class="text-xl text-slate-800">จำนวน:</span>
+            <div class="max-w-5xl mx-auto px-4"
+                x-data="{ 
+                    count: 1, 
+                    stock: <?php echo (int)$row['remain']; ?>, 
+                    p_id: <?php echo (int)$row['id']; ?>,
+                    isAdding: false,
+                    message: ''
+                }">
 
-                    <div class="flex items-center border border-slate-200 rounded overflow-hidden bg-white shadow-sm">
-                        <button
-                            @click="if(count > 1) count--"
-                            class="px-4 py-2 text-2xl text-slate-400 hover:bg-slate-50 hover:text-slate-800 transition-colors disabled:opacity-30"
-                            :disabled="count <= 1">
-                            &minus;
-                        </button>
+                <div class="flex flex-col items-left gap-4">
+                    <span class="text-xl text-slate-500"><?php echo $row['c_name'] ?></span>
+                    <span class="text-5xl text-slate-800 uppercase font-bold"><?php echo $row['name'] ?></span>
+                </div>
 
-                        <input
-                            type="number"
-                            x-model.number="count"
-                            @input="if(count > stock) count = stock; if(count < 1) count = 1;"
-                            class="w-16 text-center text-xl text-slate-700 border-x border-slate-200 outline-none py-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-
-                        <button
-                            @click="if(count < stock) count++"
-                            class="px-4 py-2 text-2xl text-slate-400 hover:bg-slate-50 hover:text-slate-800 transition-colors disabled:opacity-30"
-                            :disabled="count >= stock">
-                            &plus;
-                        </button>
+                <div class="flex flex-wrap items-center gap-6 py-8 border-y border-slate-100 mt-10">
+                    <div class="flex items-center gap-4">
+                        <span class="text-slate-600">จำนวน:</span>
+                        <div class="flex items-center border border-slate-200 rounded overflow-hidden bg-white">
+                            <button @click="if(count > 1) count--"
+                                class="px-4 py-2 text-xl hover:bg-slate-50 disabled:opacity-30" :disabled="count <= 1">&minus;</button>
+                            <input type="number" x-model.number="count"
+                                @input="if(count > stock) count = stock; if(count < 1) count = 1;"
+                                class="w-14 text-center border-x border-slate-100 outline-none py-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                            <button @click="if(count < stock) count++"
+                                class="px-4 py-2 text-xl hover:bg-slate-50 disabled:opacity-30" :disabled="count >= stock">&plus;</button>
+                        </div>
                     </div>
 
-                    <template x-if="count >= stock">
-                        <span class="text-sm text-red-500 animate-pulse">สินค้าในสต็อกเหลือเพียง <?php echo $row['remain']; ?> ชิ้น</span>
-                    </template>
+                    <button @click="
+                            isAdding = true;
+                            fetch('add_to_cart_action.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ product_id: p_id, qty: count })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                isAdding = false;
+                                message = data.message;
+                                if(document.getElementById('cart-badge')) {
+                                    document.getElementById('cart-badge').innerText = data.cart_count;
+                                }
+                                setTimeout(() => message = '', 3000);
+                            })
+                        "
+                        :disabled="isAdding || stock <= 0"
+                        class="rounded px-10 py-3 bg-slate-800 text-white font-medium hover:bg-blue-600 transition duration-300 disabled:bg-slate-400 flex items-center gap-2">
+                        <span x-show="!isAdding">เพิ่มลงตะกร้า</span>
+                        <span x-show="isAdding" class="animate-pulse">กำลังบันทึก...</span>
+                    </button>
+
+                    <div x-show="message" x-transition.duration.500ms
+                        class="text-green-600 font-medium text-sm flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span x-text="message"></span>
+                    </div>
                 </div>
-                <button href="#" class="rounded px-4 py-2 border-1 border-slate-800 bg-slate-800 text-white hover:bg-slate-200 hover:text-slate-800! transition duration-300">เพิ่มลงตะกร้า</button>
-            </div>
 
-            <div class="grid grid-cols-12 gap-4 max-w-5xl mx-auto mt-8 border-t border-slate-200 pt-4">
-                <b class="text-slate-500 col-span-3 uppercase">โมเดล</b>
-                <span class="col-span-9 text-slate-800"><?php echo $row['name'] ?></span>
+                <div class="grid grid-cols-12 gap-y-6 mt-12 text-sm md:text-base">
+                    <span class="text-slate-400 col-span-3 uppercase">ราคา</span>
+                    <span class="text-slate-900 col-span-9 text-2xl">฿<?php echo number_format($row['price'], 2); ?></span>
 
+                    <span class="text-slate-400 col-span-3 uppercase">โมเดล</span>
+                    <span class="col-span-9 text-slate-800 font-medium"><?php echo htmlspecialchars($row['name'] ?? ''); ?></span>
 
-                <b class="text-slate-500 col-span-3">แบรนด์</b>
-                <span class="text-slate-800 col-span-9"><?php echo $row['c_name'] ?></span>
+                    <span class="text-slate-400 col-span-3 uppercase">แบรนด์</span>
+                    <span class="text-slate-800 col-span-9"><?php echo htmlspecialchars($row['c_name'] ?? ''); ?></span>
 
-                <b class="text-slate-500 col-span-3">คำอธิบาย</b>
-                <p class="text-slate-800 col-span-9"><?php echo $row['detail'] ?></p>
+                    <span class="text-slate-400 col-span-3 uppercase">คำอธิบาย</span>
+                    <p class="text-slate-600 col-span-9 leading-relaxed"><?php echo nl2br(htmlspecialchars($row['detail'] ?? '')); ?></p>
 
-                <b class="text-slate-500 col-span-3">ราคา</b>
-                <span class="text-slate-800 col-span-9">
-                    <?php echo number_format($row['price'], 2); ?>฿
-                </span>
+                    
+                </div>
             </div>
         </div>
 

@@ -1,5 +1,6 @@
 <?php
-session_start();
+include './components/navbar.php';
+// session_start();
 require_once 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -26,16 +27,16 @@ $row = $result->fetch_assoc();
     <title>แก้ไขข้อมูล</title>
 </head>
 
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-100 min-h-screen items-center justify-center">
 
-    <div class="max-w-lg w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 m-8">
+    <div class="max-w-5xl mx-auto w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 m-8">
 
         <div class="text-center mb-8">
             <h2 class="text-3xl font-bold text-slate-800">แก้ไขข้อมูล</h2>
             <p class="text-slate-500 mt-2 text-sm">ปรับปรุงข้อมูลส่วนตัวของคุณ</p>
         </div>
 
-        <form action="update.php" method="POST" class="space-y-5">
+        <form action="admin_update_user.php" method="POST" class="space-y-5">
             <input type="hidden" name="id" value="<?php echo htmlspecialchars($row['id']); ?>">
 
             <div>
@@ -156,13 +157,23 @@ $row = $result->fetch_assoc();
                 </select>
             </div>
 
+            <div>
+                <label for="province" class="block text-sm font-medium text-slate-700 mb-1">บทบาท:</label>
+                <select name="role" id="" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white cursor-pointer">>
+                    <option value="">-- เลือกบทบาท --</option>
+                    <option value="admin" <?php echo $row['role'] == 'admin' ? "selected" : "" ?>>admin</option>
+                    <option value="manager" <?php echo $row['role'] == 'manager' ? "selected" : "" ?>>manager</option>
+                    <option value="customer" <?php echo $row['role'] == 'customer' ? "selected" : "" ?>>customer</option>
+                </select>
+            </div>
+
             <div class="pt-4 mt-2 border-t border-slate-100">
                 <button type="submit"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm mb-3">
                     บันทึกการเปลี่ยนแปลง
                 </button>
 
-                <a href="showdata.php" class="block w-full text-center bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm">
+                <a href="admin_show_users.php" class="block w-full text-center bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm">
                     ยกเลิก
                 </a>
             </div>

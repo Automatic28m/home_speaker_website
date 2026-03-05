@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include "./db.php";
 
+// 1. Handle Adding Category
 if (isset($_POST['add_category'])) {
     $name = $_POST['name'];
     $stmt = $conn->prepare("INSERT INTO categories (name) VALUES (?)");
@@ -11,11 +12,29 @@ if (isset($_POST['add_category'])) {
     header("Location: admin_show_categories.php");
 }
 
-// 2. Handle Deleting Category
+// 2. Handle Updating Category (New Logic)
+if (isset($_POST['update_category'])) {
+    $id = $_POST['id'];
+    $name = $_POST['name'];
+    $stmt = $conn->prepare("UPDATE categories SET name = ? WHERE id = ?");
+    $stmt->bind_param("si", $name, $id);
+    $stmt->execute();
+    header("Location: admin_show_categories.php");
+}
+
+// 3. Handle Deleting Category
 if (isset($_GET['delete_id'])) {
     $id = $_GET['delete_id'];
     $conn->query("DELETE FROM categories WHERE id = $id");
     header("Location: admin_show_categories.php");
+}
+
+// 4. Fetch Data for Editing (New Logic)
+$edit_row = null;
+if (isset($_GET['edit_id'])) {
+    $id = $_GET['edit_id'];
+    $res = $conn->query("SELECT * FROM categories WHERE id = $id");
+    $edit_row = $res->fetch_assoc();
 }
 ?>
 <!DOCTYPE html>
@@ -32,14 +51,32 @@ if (isset($_GET['delete_id'])) {
     <div class="max-w-4xl mx-auto my-5 space-y-8">
 
         <div class="bg-white shadow-md rounded p-6 border-1">
-            <h2 class="text-xl font-bold text-slate-800 mb-4">เพิ่มหมวดหมู่ใหม่</h2>
+            <h2 class="text-xl font-bold text-slate-800 mb-4">
+                <?php echo $edit_row ? 'แก้ไขหมวดหมู่' : 'เพิ่มหมวดหมู่ใหม่'; ?>
+            </h2>
             <form method="POST" class="flex gap-4">
+                <?php if ($edit_row): ?>
+                    <input type="hidden" name="id" value="<?php echo $edit_row['id']; ?>">
+                <?php endif; ?>
+
                 <input type="text" name="name" placeholder="ชื่อหมวดหมู่" required
-                    class="flex-1 px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-                <button type="submit" name="add_category"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition">
-                    บันทึก
-                </button>
+                    value="<?php echo $edit_row ? htmlspecialchars($edit_row['name']) : ''; ?>"
+                    class="flex-1 px-4 py-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+
+                <?php if ($edit_row): ?>
+                    <button type="submit" name="update_category"
+                        class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded font-semibold transition">
+                        บันทึกการแก้ไข
+                    </button>
+                    <a href="admin_show_categories.php" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2 rounded font-semibold transition flex items-center">
+                        ยกเลิก
+                    </a>
+                <?php else: ?>
+                    <button type="submit" name="add_category"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-semibold transition">
+                        บันทึก
+                    </button>
+                <?php endif; ?>
             </form>
         </div>
 
@@ -62,7 +99,9 @@ if (isset($_GET['delete_id'])) {
                                 <tr class="hover:bg-slate-50 transition">
                                     <td class="p-4 border-b"><?php echo $row['id']; ?></td>
                                     <td class="p-4 border-b font-medium"><?php echo $row['name']; ?></td>
-                                    <td class="p-4 border-b text-center">
+                                    <td class="p-4 border-b text-center space-x-3">
+                                        <a href="?edit_id=<?php echo $row['id']; ?>"
+                                            class="text-amber-600 hover:underline text-sm font-semibold">แก้ไข</a>
                                         <a href="?delete_id=<?php echo $row['id']; ?>"
                                             onclick="return confirm('คุณแน่ใจหรือไม่?')"
                                             class="text-red-600 hover:underline text-sm font-semibold">ลบ</a>
@@ -80,7 +119,7 @@ if (isset($_GET['delete_id'])) {
         </div>
 
         <div class="text-center">
-            <a href="../products/insert.php" class="text-blue-600 hover:underline text-sm">← กลับไปที่หน้าเพิ่มสินค้า</a>
+            <a href="admin_show_products.php" class="text-blue-600 hover:underline text-sm">← กลับไปที่หน้าจัดการสินค้า</a>
         </div>
     </div>
 </body>

@@ -6,10 +6,11 @@ $fname = $_POST['first_name'];
 $lname = $_POST['last_name'];
 $age = $_POST['age'];
 $province = $_POST['province'];
+$role = $_POST['role'];
 
-$stmt = $conn->prepare("UPDATE users SET first_name=?, last_name=?, age=?, province=? WHERE id=?");
-$stmt->bind_param("ssisi", $fname, $lname, $age, $province, $id);
+$stmt = $conn->prepare("UPDATE users SET first_name=?, last_name=?, age=?, province=?, role=? WHERE id=?");
+$stmt->bind_param("ssissi", $fname, $lname, $age, $province, $role, $id);
 if($stmt->execute()) {
-    header("Location: showUsers.php");
+    header("Location: admin_show_users.php");
 }
 ?>

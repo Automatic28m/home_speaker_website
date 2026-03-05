@@ -1,5 +1,7 @@
+<?php include './components/navbar.php' ?>
 <?php
-session_start();
+
+// session_start();
 require_once 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -20,7 +22,7 @@ $user_id = $_SESSION['user_id'];
     <title>ข้อมูลสมาชิก</title>
 </head>
 
-<!-- <?php include './components/navbar.php' ?> -->
+
 
 <body class="bg-slate-100 min-h-screen">
 
@@ -87,12 +89,12 @@ $user_id = $_SESSION['user_id'];
                                 <td class="px-6 py-4"><?php echo htmlspecialchars($row['province']); ?></td>
                                 <td class="px-6 py-4"><?php echo htmlspecialchars($row['email']); ?></td>
                                 <td class="px-6 py-4">
-                                    <span class="<?php echo $row['role'] == 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'; ?> px-2 py-1 rounded-full text-xs font-medium uppercase">
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium uppercase">
                                         <?php echo htmlspecialchars($row['role']); ?>
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-center font-medium">
-                                    <a href="edit.php?id=<?php echo $row['id']; ?>" class="text-blue-600 hover:text-blue-800 transition-colors mr-3">แก้ไข</a>
+                                    <a href="admin_edit_user.php?id=<?php echo $row['id']; ?>" class="text-blue-600 hover:text-blue-800 transition-colors mr-3">แก้ไข</a>
                                     <?php if ($role == 'admin' && $row['id'] != $_SESSION['user_id']) { ?>
                                         <a href="deleteUser.php?id=<?php echo $row['id']; ?>" onclick="return confirm('แน่ใจหรือไม่ที่จะลบบัญชีนี้? ข้อมูลจะไม่สามารถกู้คืนได้')" class="text-red-600 hover:text-red-800 transition-colors">ลบ</a>
                                     <?php } ?>
