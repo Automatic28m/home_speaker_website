@@ -34,13 +34,14 @@ CREATE TABLE products (
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    payment VARCHAR(100),
-    pay_status VARCHAR(50),
-    order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    bank_transfer VARCHAR(100),
+    payment VARCHAR(100), -- bank transfer / cod --
+    pay_status VARCHAR(50), -- pending, paid --
+    order_date DATETIME DEFAULT CURRENT_TIMESTAMP, 
+    -- bank_transfer VARCHAR(100),
     date_transfer DATE,
     time_transfer TIME,
-    delivery VARCHAR(100),
+    status VARCHAR(100), -- confirmed/pending --
+    delivery VARCHAR(100), -- yes/no
     CONSTRAINT fk_order_user FOREIGN KEY (user_id) 
         REFERENCES users(id) ON DELETE SET NULL
 );

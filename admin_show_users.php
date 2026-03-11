@@ -26,7 +26,7 @@ $user_id = $_SESSION['user_id'];
 
 <body class="bg-slate-100 min-h-screen">
 
-    <div class="my-8 max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100">
+    <div class="my-8 max-w-6xl mx-auto bg-white rounded-2xl p-6 md:p-8">
 
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
             <div>

@@ -2,9 +2,12 @@
 include "./db.php";
 if (session_status() === PHP_SESSION_NONE) session_start();
 
+if (!isset($_SESSION['sort'])) $_SESSION['sort'] = 'newest';
+if (!isset($_SESSION['category'])) $_SESSION['category'] = 'all';
+
 $search = $_GET['q'] ?? '';
-$sort_choice = $_SESSION['sort'] ?? 'newest';
-$filter_category = $_SESSION['category'] ?? 'all';
+$sort_choice = $_SESSION['sort'];
+$filter_category = $_SESSION['category'];
 
 switch ($sort_choice) {
     case 'asc':

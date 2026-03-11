@@ -50,7 +50,7 @@ if (isset($_GET['edit_id'])) {
 <body class="bg-slate-50">
     <div class="max-w-4xl mx-auto my-5 space-y-8">
 
-        <div class="bg-white shadow-md rounded p-6 border-1">
+        <div class="bg-white  rounded p-6">
             <h2 class="text-xl font-bold text-slate-800 mb-4">
                 <?php echo $edit_row ? 'แก้ไขหมวดหมู่' : 'เพิ่มหมวดหมู่ใหม่'; ?>
             </h2>
@@ -80,7 +80,7 @@ if (isset($_GET['edit_id'])) {
             </form>
         </div>
 
-        <div class="bg-white shadow-md rounded p-6 border-1">
+        <div class="bg-white rounded p-6">
             <h2 class="text-xl font-bold text-slate-800 mb-4">หมวดหมู่ที่มีอยู่</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">

@@ -42,7 +42,7 @@ if (isset($_GET['delete_id'])) {
 <?php include "./components/navbar.php" ?>
 
 <body class="bg-slate-50">
-    <div class="my-8 w-auto mx-4 bg-white rounded shadow-xl p-6 md:p-8 border border-slate-100">
+    <div class="my-8 w-auto mx-4 bg-white rounded shadow-xl p-6 md:p-8 border-slate-100">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-slate-800">รายการสินค้าทั้งหมด</h2>
             <a href="admin_add_product.php">
