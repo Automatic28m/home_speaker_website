@@ -4,6 +4,13 @@ $id = $_GET['id'];
 $sql = "SELECT * FROM products WHERE id = $id";
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
+
+include './components/navbar.php';
+
+if ($_SESSION['role'] == 'customer') {
+    header("Location: index.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -13,7 +20,6 @@ $row = $result->fetch_assoc();
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>แก้ไขสินค้า</title>
 </head>
-<?php include './components/navbar.php' ?>
 
 <body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
     <div class="max-w-lg w-full bg-white rounded-2xl shadow-lg p-8">

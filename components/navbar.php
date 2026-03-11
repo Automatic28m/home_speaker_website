@@ -1,6 +1,4 @@
 <?php
-// Note: session_start() should only be called once. 
-// If it's already in your main files, you can remove it from here.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -10,19 +8,22 @@ require_once 'db.php';
 
 $user_id = $_SESSION['user_id'] ?? null;
 $role = $_SESSION['role'] ?? null;
+$initial_cart_count = 0;
 
 if ($user_id) {
     $result = $conn->query("SELECT * FROM users WHERE id = $user_id");
     $row_user = $result->fetch_assoc();
-}
 
-$initial_cart_count = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
+    $cart_res = $conn->query("SELECT SUM(quantity) as total FROM cart WHERE user_id = $user_id");
+    $cart_row = $cart_res->fetch_assoc();
+    $initial_cart_count = $cart_row['total'] ?? 0;
+}
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark font-['Prompt',_sans-serif]">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark font-['Prompt',_sans-serif] w-full">
     <div class="container-fluid">
         <a class="navbar-brand font-bold tracking-tighter" href="index.php">LUXOUND</a>
 
@@ -31,7 +32,7 @@ $initial_cart_count = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 
                 <li class="nav-item"><a class="nav-link" href="index.php">หน้าหลัก</a></li>
                 <li class="nav-item"><a class="nav-link" href="order_detail.php">คำสั่งซื้อของคุณ</a></li>
 
-                <?php if ($role == 'admin') { ?>
+                <?php if ($role == 'admin' || $role == 'manager') { ?>
                     <li class="nav-item"><span class="nav-link">|</span></li>
                     <li class="nav-item"><a class="nav-link" href="admin_order_list.php">รายการสั่งซื้อ</a></li>
                     <li class="nav-item"><a class="nav-link" href="admin_show_users.php">สมาชิก</a></li>

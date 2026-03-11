@@ -56,11 +56,11 @@ $images = explode(',', $row['img_files']);
                 </div>
 
                 <button @click="activeSlide = activeSlide === 0 ? images.length - 1 : activeSlide - 1"
-                    class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full! shadow-md w-[50px] h-[50px] border border-slate-200 z-10 transition-colors flex items-center">
+                    class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full! shadow-md w-[50px] h-[50px] border border-slate-200 z-10 transition-colors flex justify-center items-center">
                     &#8592;
                 </button>
                 <button @click="activeSlide = activeSlide === images.length - 1 ? 0 : activeSlide + 1"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full! shadow-md w-[50px] h-[50px] border border-slate-200 z-10 transition-colors flex items-center">
+                    class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full! shadow-md w-[50px] h-[50px] border border-slate-200 z-10 transition-colors flex justify-center  items-center">
                     &#8594;
                 </button>
 

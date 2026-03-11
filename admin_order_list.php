@@ -69,28 +69,47 @@ $order_result = $conn->query("SELECT o.*, u.first_name, u.last_name,
                     <?php while ($row = $order_result->fetch_assoc()): ?>
                         <tr class="hover:bg-slate-50/50 transition-colors">
                             <td class="p-4 font-mono text-[10px]">#<?php echo str_pad($row['id'], 5, '0', STR_PAD_LEFT); ?></td>
-                            <td class="p-4 text-sm font-semibold"><?php echo $row['first_name'] . " " . $row['last_name']; ?></td>
-                            <td class="p-4 font-bold text-sm">฿<?php echo number_format($row['total_amount'], 2); ?></td>
+                            <td class="p-4 text-sm font-semibold text-slate-700"><?php echo $row['first_name'] . " " . $row['last_name']; ?></td>
+                            <td class="p-4 text-right font-bold text-sm">฿<?php echo number_format($row['total_amount'], 2); ?></td>
                             <td class="p-4 text-center">
                                 <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase 
-                                <?php echo ($row['status'] == 'completed') ? 'bg-blue-50 text-blue-600' : (($row['status'] == 'cancelled') ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'); ?>">
+                <?php echo ($row['status'] == 'completed') ? 'bg-blue-50 text-blue-600' : (($row['status'] == 'cancelled') ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'); ?>">
                                     <?php echo $row['status']; ?>
                                 </span>
                             </td>
-                            <?php if ($row['status'] == 'pending') { ?>
-                                <td class="p-4 text-right flex gap-1">
-                                    <?php if ($row['status'] !== 'completed' && $row['status'] !== 'cancelled'): ?>
-                                        <form method="POST">
-                                            <input type="hidden" name="confirm_id" value="<?php echo $row['id']; ?>">
-                                            <button type="submit" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded font-bold">ยืนยัน</button>
-                                        </form>
-                                        <form method="POST">
-                                            <input type="hidden" name="cancel_id" value="<?php echo $row['id']; ?>">
-                                            <button type="submit" class="bg-red-500 text-white text-[10px] px-2 py-1 rounded font-bold">ปฏิเสธ</button>
-                                        </form>
-                                    <?php endif; ?>
-                                </td>
-                            <?php } ?>
+                            <td class="p-4 text-right flex justify-end gap-1">
+                                <?php if ($row['status'] == 'pending'): ?>
+                                    <form method="POST" onsubmit="return confirm('ยืนยันออเดอร์นี้?')">
+                                        <input type="hidden" name="confirm_id" value="<?php echo $row['id']; ?>">
+                                        <button type="submit" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-blue-700 transition">ยืนยัน</button>
+                                    </form>
+                                    <form method="POST" onsubmit="return confirm('ปฏิเสธและคืนสต็อกออเดอร์นี้?')">
+                                        <input type="hidden" name="cancel_id" value="<?php echo $row['id']; ?>">
+                                        <button type="submit" class="bg-red-500 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-red-600 transition">ปฏิเสธ</button>
+                                    </form>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+
+                        <tr class="bg-slate-50/40">
+                            <td colspan="5" class="px-12 py-2 border-b border-slate-100">
+                                <div class="flex flex-wrap gap-x-6 gap-y-1">
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">รายการสินค้า:</span>
+                                    <?php
+                                    // ดึงรายละเอียดสินค้าเฉพาะออเดอร์นี้
+                                    $order_id = $row['id'];
+                                    $detail_res = $conn->query("SELECT od.quantity, p.name FROM order_details od 
+                                               JOIN products p ON od.product_id = p.id 
+                                               WHERE od.order_id = $order_id");
+                                    while ($item = $detail_res->fetch_assoc()):
+                                    ?>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-[11px] text-slate-600"><?php echo htmlspecialchars($item['name']); ?></span>
+                                            <span class="text-[10px] text-slate-400 font-bold italic">x<?php echo $item['quantity']; ?></span>
+                                        </div>
+                                    <?php endwhile; ?>
+                                </div>
+                            </td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>

@@ -1,4 +1,3 @@
-<?php include "./components/navbar.php" ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +11,8 @@
     <title>หน้าหลัก</title>
 </head>
 
-<body class="font-['Prompt',_sans-serif]"> 
+<body class="font-['Prompt',_sans-serif]">
+    <?php include "./components/navbar.php" ?>
     <?php include "./components/product_grid.php" ?>
 </body>
 

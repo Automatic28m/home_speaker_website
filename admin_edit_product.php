@@ -1,5 +1,6 @@
 <?php
 error_reporting(E_ALL);
+session_start();
 ini_set('display_errors', 1);
 include './db.php';
 
@@ -7,6 +8,11 @@ $id = $_GET['id'] ?? null;
 if (!$id) {
     header("Location: admin_show_products.php");
     exit;
+}
+
+if ($_SESSION['role'] == 'customer') {
+    header("Location: index.php");
+    exit();
 }
 
 $stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");

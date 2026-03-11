@@ -1,5 +1,4 @@
 <?php
-include "./components/navbar.php";
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -11,14 +10,15 @@ if (!$user_id) {
     exit();
 }
 
-// 1. ตรรกะการลบสินค้า (Delete)
 if (isset($_POST['delete_id'])) {
     $pid = $_POST['delete_id'];
+    // เปลี่ยน user_id เป็น user_id ตามแผนผังของคุณ
     $sql = "DELETE FROM cart WHERE user_id = $user_id AND product_id = $pid";
     $conn->query($sql);
+    header("Location: cart.php");
+    exit();
 }
 
-// 2. ตรรกะการอัปเดตจำนวน (Recalculate)
 if (isset($_POST['qty'])) {
     $count = count($_POST['qty']);
     for ($i = 0; $i < $count; $i++) {
@@ -27,9 +27,14 @@ if (isset($_POST['qty'])) {
         $sql = "UPDATE cart SET quantity = $qty WHERE user_id = $user_id AND product_id = $pid";
         $conn->query($sql);
     }
+    header("Location: cart.php");
+    exit();
 }
 
-// 3. อ่านข้อมูลจากตาราง cart + products
+// 4. เมื่อจัดการข้อมูลเสร็จแล้ว ค่อยเรียก Navbar มาแสดงผล
+include "./components/navbar.php";
+
+// 5. อ่านข้อมูลเพื่อมาแสดงในตาราง (ใช้ user_id ให้ตรงกับ Diagram)
 $sql = "SELECT c.quantity, p.* FROM cart c 
         LEFT JOIN products p ON c.product_id = p.id 
         WHERE c.user_id = ?";

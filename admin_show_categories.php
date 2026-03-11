@@ -3,7 +3,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include "./db.php";
 
-// 1. Handle Adding Category
 if (isset($_POST['add_category'])) {
     $name = $_POST['name'];
     $stmt = $conn->prepare("INSERT INTO categories (name) VALUES (?)");
@@ -12,7 +11,6 @@ if (isset($_POST['add_category'])) {
     header("Location: admin_show_categories.php");
 }
 
-// 2. Handle Updating Category (New Logic)
 if (isset($_POST['update_category'])) {
     $id = $_POST['id'];
     $name = $_POST['name'];
@@ -22,19 +20,24 @@ if (isset($_POST['update_category'])) {
     header("Location: admin_show_categories.php");
 }
 
-// 3. Handle Deleting Category
 if (isset($_GET['delete_id'])) {
     $id = $_GET['delete_id'];
     $conn->query("DELETE FROM categories WHERE id = $id");
     header("Location: admin_show_categories.php");
 }
 
-// 4. Fetch Data for Editing (New Logic)
 $edit_row = null;
 if (isset($_GET['edit_id'])) {
     $id = $_GET['edit_id'];
     $res = $conn->query("SELECT * FROM categories WHERE id = $id");
     $edit_row = $res->fetch_assoc();
+}
+
+include './components/navbar.php';
+
+if ($_SESSION['role'] == 'customer') {
+    header("Location: index.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -45,7 +48,6 @@ if (isset($_GET['edit_id'])) {
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>จัดการหมวดหมู่</title>
 </head>
-<?php include './components/navbar.php' ?>
 
 <body class="bg-slate-50">
     <div class="max-w-4xl mx-auto my-5 space-y-8">

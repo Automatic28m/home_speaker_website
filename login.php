@@ -45,7 +45,7 @@
                     <div class="flex-grow border-t border-slate-200"></div>
                 </div>
 
-                <a href="regis.html" class="block w-full">
+                <a href="regis.php" class="block w-full">
                     <button type="button"
                         class="w-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm">
                         สมัครสมาชิกใหม่

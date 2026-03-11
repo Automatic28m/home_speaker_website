@@ -4,15 +4,22 @@ include './components/navbar.php';
 require_once 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.html");
+    header("Location: index.php");
+    exit();
+}
+$role = $_SESSION['role'];
+
+if ($role == 'customer') {
+    header("Location: index.php");
+    exit();
+} 
+
+if ($role == 'manager') {
+    header("Location: admin_show_users.php");
     exit();
 }
 
 $id = $_GET['id'];
-
-if ($_SESSION['role'] == 'customer' && $_SESSION['user_id'] != $id) {
-    die("<div style='text-align:center; margin-top:50px; font-family:sans-serif;'><h2>คุณไม่มีสิทธิ์แก้ไขข้อมูลของผู้อื่น</h2><a href='showdata.php'>กลับหน้าหลัก</a></div>");
-}
 
 $result = $conn->query("SELECT * FROM users WHERE id = $id");
 $row = $result->fetch_assoc();
@@ -158,7 +165,7 @@ $row = $result->fetch_assoc();
             </div>
 
             <div>
-                <label for="province" class="block text-sm font-medium text-slate-700 mb-1">บทบาท:</label>
+                <label for="role" class="block text-sm font-medium text-slate-700 mb-1">บทบาท:</label>
                 <select name="role" id="" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white cursor-pointer">>
                     <option value="">-- เลือกบทบาท --</option>
                     <option value="admin" <?php echo $row['role'] == 'admin' ? "selected" : "" ?>>admin</option>

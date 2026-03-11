@@ -1,8 +1,14 @@
 <?php
+include "./components/navbar.php";
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include './db.php';
+require_once 'db.php';
+
+if ($_SESSION['role'] == 'customer') {
+    header("Location: index.php");
+    exit();
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name        = $_POST['name'];
@@ -57,7 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>เพิ่มสินค้าใหม่</title>
 </head>
-<?php include "./components/navbar.php" ?>
 
 <body class="bg-slate-100 min-h-screen">
     <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-8 my-5">

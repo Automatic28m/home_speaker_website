@@ -4,7 +4,6 @@ include './db.php';
 if (isset($_GET['delete_id'])) {
     $id = $_GET['delete_id'];
 
-    // 1. Fetch image filenames before deleting the database record
     $stmt = $conn->prepare("SELECT img_files FROM products WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -12,23 +11,25 @@ if (isset($_GET['delete_id'])) {
     $product = $res->fetch_assoc();
 
     if ($product && !empty($product['img_files'])) {
-        // 2. Split the comma-separated string into an array
         $images = explode(',', $product['img_files']);
         $upload_dir = "./prod_images/";
 
-        // 3. Loop through and delete each file from the local folder
         foreach ($images as $img) {
             $file_path = $upload_dir . trim($img);
             if (file_exists($file_path)) {
-                unlink($file_path); // Physically deletes the file
+                unlink($file_path);
             }
         }
     }
 
-    // 4. Finally, delete the record from the database
     $conn->query("DELETE FROM products WHERE id = $id");
     header("Location: admin_show_products.php");
     exit();
+
+    if ($_SESSION['role'] == 'customer') {
+        header("Location: index.php");
+        exit();
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -39,7 +40,8 @@ if (isset($_GET['delete_id'])) {
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>จัดการสินค้า</title>
 </head>
-<?php include "./components/navbar.php" ?>
+
+<?php include './components/navbar.php';?>
 
 <body class="bg-slate-50">
     <div class="my-8 w-auto mx-4 bg-white rounded shadow-xl p-6 md:p-8 border-slate-100">
